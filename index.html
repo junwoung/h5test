@@ -1,0 +1,152 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <meta content="email=no" name="format-detection">
+    <meta name="description" content="不超过150个字符"/>
+    <meta name="keywords" content=""/>
+    <meta content="caibaojian" name="author"/>
+    <title>前端开发</title>
+    <link href="static/base.css" rel="stylesheet">
+    <script src="static/flexible.js"></script>
+    <style>
+        .clearfix{overflow:hidden;_zoom:1;}
+        .header{font-size: .5rem;background-color: #3896f8;text-align: center;color: #fff;height: 2em;line-height: 2em;}
+        .select{width: 8em;}
+        .ul_body{background-color: #fff;position: relative;min-height: 12.14rem;padding: .1rem;box-sizing: content-box;}
+        .li_one{padding: 0.5em;border-bottom:1px solid #ddd;margin-bottom: 10px;position: relative;}
+        .img{width: 1rem;float: left;position: absolute;border: 1px solid #ddd;height: 1rem;}
+        .article{float: left;overflow: hidden;margin-left: 1.2rem;}
+        .title{display: block;color: #000;font-size: 0.34rem;}
+        .name{color: #bbb;}
+        .txt{color: #666;max-height: 1rem;width: 5.6rem;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
+        .nomore{color: #999999;text-align: center;margin-bottom: 20px;}
+        .top{position: fixed;padding: 0.2rem 0.15rem;background-color: #fff;box-shadow: 0 0 3px #ddd;bottom: 0.4rem;right: 0.1rem;color: #3896f8;border-radius: 50%;visibility: hidden;}
+    </style>
+</head>
+
+<body>
+<div class="body">
+    <header class="header">myPhoneAppPage</header>
+    <!--<select onchange="getSelect()" id="select" class="select">-->
+        <!--<option value="1">wangjun</option>-->
+        <!--<option value="2">zhengpeixin</option>-->
+    <!--</select>-->
+    <!--<select class="select select2">-->
+        <!--<option value="3">wangjun2</option>-->
+        <!--<option value="4">zhengpeixin2</option>-->
+    <!--</select>-->
+    <ul class="ul_body">
+
+    </ul>
+    <div class="top" onclick="goTop()">
+        顶部
+    </div>
+</div>
+<script>
+    function getSelect() {
+        let value = event.target.value;
+        console.log(value);
+        if(value == 2){
+            let dom = document.querySelector('.select2');
+            dom.value = 4;
+            console.log(dom);
+        }
+    }
+    var arr = [];
+    var showArr = [],page = 1,size = 10;
+    const tchars = '前端学习基础很重要';
+    const bchars = '当开启S2S补量的配置时，需要输入模拟终端数。单机最大模拟终端数为5。当配置的模拟终端数小于5时，S2S补量时将从该单机绑定的虚拟mac中选择相应数量的mac进行上报。该配置将会影响上报总量，设置上报总量时在原有基础上根据配置的模拟终端数调整相 应倍数。';
+    const users = ['wangjun','zhengpeixin','yepeichun','yujiayue','zhangyiheng','maxinxin','zhudejun'];
+    const tcharArr = tchars.split('');
+    const bcharArr = bchars.split('');
+    const tlen = tcharArr.length;
+    const blen = bcharArr.length;
+    var ul_body = document.querySelector('.ul_body');
+    const clinetH = document.documentElement.clientHeight || document.body.clientHeight;
+    var timeout = null;
+    var nomore = false;
+    /**
+     * 去一个范围内的随机数
+     * Math.floor(Math.random()*(max-min+1)+min)
+     * */
+    for(let i = 0; i < 108; i++){
+        let title = '',body = '',user = null;
+        let ti = Math.floor(Math.random()*(tlen-2+1)+2);
+        let bi = Math.floor(Math.random()*(blen-10+1)+10);
+        for(let j = 0; j < ti; j++){
+            title += tcharArr[Math.floor(Math.random()*tlen)];
+        }
+        for(let j = 0; j < bi; j++){
+            body += bcharArr[Math.floor(Math.random()*blen)];
+        }
+        arr.push({
+            id: i+'_'+ti+'_'+bi,
+            name: users[Math.floor(Math.random()*users.length)],
+            title: title,
+            body: body
+        });
+    }
+    function getData(pageNum,size) {
+        for(let i = (pageNum-1)*size; i < pageNum*size; i++){
+            if(i > arr.length-1){
+                nomore = true;
+                return;
+            }
+            showArr.push(arr[i]);
+            createDom(arr[i]);
+        }
+    }
+    function createDom(obj) {
+        let dom = document.createElement('li');
+        dom.className = 'li_one clearfix';
+        dom.setAttribute('onclick','getMsg("'+obj.id+'")')
+        dom.innerHTML = "<div class='img'></div><div class='article'><lable class='title'>"+obj.title+"</lable><span class='name'>"+obj.name+"</span><div class='txt'>"+obj.body+"</div></div>";
+        ul_body.appendChild(dom);
+    }
+    getData(page,size);
+    window.onscroll = function () {
+        timeout = setTimeout(function () {
+            clearTimeout(timeout);
+            let bottom = ul_body.getBoundingClientRect().bottom;
+            if((bottom - clinetH) <= 10 && !nomore){
+                page++;
+                getData(page,size);
+            }
+            else if((bottom - clinetH) <= 10 && nomore){
+                if(document.querySelector('.body').lastChild.nodeName !== 'P'){
+                    let dom = document.createElement('p');
+                    dom.className = 'nomore';
+                    dom.innerText = '没有更多';
+                    document.querySelector('.body').appendChild(dom);
+                }
+            }
+            let st = document.documentElement.scrollTop || document.body.scrollTop;
+            if(st > 100){
+                document.querySelector('.top').style.visibility = 'visible';
+            }
+            if(st < 100){
+                document.querySelector('.top').style.visibility = 'hidden';
+            }
+        },2000);
+    };
+    function goTop() {
+        let top = document.documentElement.scrollTop || document.body.scrollTop;
+        let height = top/80;
+        let interv = setInterval(function () {
+            window.scrollBy(0,-height);
+            let topNew = document.documentElement.scrollTop || document.body.scrollTop;
+            if(topNew <= 0){
+                clearInterval(interv);
+            }
+        },1)
+    }
+    function getMsg(id) {
+        alert('当前作者id： '+id);
+    }
+</script>
+</body>
+</html>
